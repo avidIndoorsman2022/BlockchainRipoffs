@@ -1,4 +1,4 @@
-BlockchainRipoffs is a system designed to collect the wallet addresses of nefarious actors on the blockchain. Originally intended for scams like those found on Youtube (where long winded discussions featuring someone famous in the crypto world is suddenly willing to give away their fortunes by offering to double your money - all you have to do is send them some amount of crypto).
+Wallet Reputations is a system designed to collect the wallet addresses of nefarious actors on the blockchain. Originally intended for scams like those found on Youtube (where long winded discussions featuring someone famous in the crypto world is suddenly willing to give away their fortunes by offering to double your money - all you have to do is send them some amount of crypto).
 
 After entering the report, the idea is that users (and wallet makers) can consult this database before executing a transaction to see if anyone else has ever had trouble with the other party's wallet address.
 
