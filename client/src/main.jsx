@@ -1,11 +1,14 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
-import './index.css'
-import App from './App'
+import React from "react";
+import ReactDOM from "react-dom";
+import { WalletReputationsProvider } from "./context/WalletReputationsContext";
+import "./index.css";
+import App from "./App";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-)
+  <WalletReputationsProvider>
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  </WalletReputationsProvider>,
+  document.getElementById("root")
+);

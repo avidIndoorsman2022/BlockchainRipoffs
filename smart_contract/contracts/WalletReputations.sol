@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-contract Transactions {
+contract WalletReputations {
     uint public reputationReportCount;
 
     struct ReputationReportStruct {
@@ -38,7 +38,7 @@ contract Transactions {
                                     bool _disputed,
                                     string memory _txnId,
                                     string memory _usersMessages,
-                                    string memory _tokenName) public {
+                                    string memory _tokenName) payable public {
         reputationReports.push(ReputationReportStruct(_sender,
                                               _receiver, 
                                               _timestamp,
@@ -53,7 +53,7 @@ contract Transactions {
         emit NewReputationReport(_sender, _receiver, _timestamp, _amount, _whoFiled, _disputed, _txnId, _usersMessages, _tokenName);
     }
 
-    function getAllReputationReports() public view returns (reputationReportStruct[] memory) {
+    function getAllReputationReports() public view returns (ReputationReportStruct[] memory) {
         return reputationReports;
     }
 
@@ -67,7 +67,7 @@ contract Transactions {
     //
     function updateReputationReport(string memory _txnId, 
                                     bool _disputed,
-                                    string memory _messages) payable public returns (string memory _returnCode) {
+                                    string memory _messages) payable public returns (uint _returnCode) {
         uint returnCode; // 0 = success, anything else is an error
         uint index = transactionIdToIndex[_txnId];
         ReputationReportStruct memory reputationReport = reputationReports[index];
@@ -91,6 +91,7 @@ contract Transactions {
           // Send back failure - txnIds don't match up for some reason
             returnCode = 20;
         }      
+        return returnCode;
     }
 
     function memcmp(bytes memory a, bytes memory b) internal pure returns(bool) {
