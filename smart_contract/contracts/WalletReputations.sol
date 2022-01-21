@@ -4,6 +4,8 @@ pragma solidity ^0.8.0;
 
 contract WalletReputations {
     uint public reputationReportCount;
+    address payable public admin;
+    uint256 public entryFee; // $5 USD (in Wei) but can be adjusted by admin
 
     struct ReputationReportStruct {
         address sender;  
@@ -30,6 +32,15 @@ contract WalletReputations {
     //
     mapping(string => uint) public transactionIdToIndex; 
 
+    //
+    // For our constructor, we declare that the owner is first 
+    // address to deploy.
+    //
+    constructor() {
+        admin = payable(msg.sender);
+        entryFee = 1551990000000000; // about $5 
+    }
+
     function createReputationReport(address _sender, 
                                     address _receiver, 
                                     uint256 _timestamp,
@@ -39,6 +50,14 @@ contract WalletReputations {
                                     string memory _txnId,
                                     string memory _usersMessages,
                                     string memory _tokenName) payable public {
+        //
+        // Make sure the caller has provided enough of an entry fee.
+        //
+        require(
+            msg.value >= entryFee,
+            "Minimum entry fee not met"
+        );
+        
         reputationReports.push(ReputationReportStruct(_sender,
                                               _receiver, 
                                               _timestamp,
@@ -67,33 +86,66 @@ contract WalletReputations {
     //
     function updateReputationReport(string memory _txnId, 
                                     bool _disputed,
-                                    string memory _messages) payable public returns (uint _returnCode) {
-        uint returnCode; // 0 = success, anything else is an error
+                                    string memory _messages) payable public {
+        //
+        // Make sure the caller has provided enough of an entry fee.
+        //
+        require(
+            msg.value >= entryFee,
+            "Minimum entry fee not met"
+        );
+
         uint index = transactionIdToIndex[_txnId];
         ReputationReportStruct memory reputationReport = reputationReports[index];
-        if (strcmp(_txnId, reputationReport.txnId)) {
-          //
-          // In order to maintain integrity, the sender MUST
-          // be either the reputationReports .sender or .receiver.
-          // It's a payable function since we are updating data
-          // on chain.
-          // 
-          if (msg.sender == reputationReport.sender || 
-              msg.sender == reputationReport.receiver) {
-              reputationReport.disputed = _disputed;
-              reputationReport.usersMessages = _messages;
-              returnCode = 0;
-          } else {
-            // Send back failure - update can only be done by the sender or receiver of the original transaction
-            returnCode = 10;
-          }
-        } else {
-          // Send back failure - txnIds don't match up for some reason
-            returnCode = 20;
-        }      
-        return returnCode;
+        //
+        // Make sure the transaction IDs match up.
+        //
+        require((strcmp(_txnId, reputationReport.txnId) == true),
+                "Transaction Id mismatch");
+        //
+        // In order to maintain integrity, the sender MUST
+        // be either the reputationReports .sender or .receiver.
+        // It's a payable function since we are updating data
+        // on chain.
+        //
+        require((msg.sender == reputationReport.sender || 
+                 msg.sender == reputationReport.receiver),
+            "Update can only be done by the sender or receiver of the original transaction");
+
+        //
+        // Finally, make the update(s).
+        //
+        reputationReport.disputed = _disputed;
+        reputationReport.usersMessages = _messages;
     }
 
+    //
+    // Admin functions
+    //
+    modifier onlyAdmin() {
+        require(msg.sender == admin);
+        _;
+    }
+
+    //
+    // In Solidity 0.8.0 and higher, we need to explicitly
+    // cast addresses like msg.sender to payable.
+    //
+    function withdraw() payable public onlyAdmin {
+        payable(msg.sender).transfer(address(this).balance);
+    }
+
+    //
+    // Allow the admin to change the entry fee after deployment.
+    //
+    function changeEntryFee(uint256 newEntryFeeInWei) public onlyAdmin {
+        require (newEntryFeeInWei != entryFee);
+        entryFee = newEntryFeeInWei;
+    }
+
+    //
+    // Utilities
+    //
     function memcmp(bytes memory a, bytes memory b) internal pure returns(bool) {
         return (a.length == b.length) && (keccak256(a) == keccak256(b));
     }
