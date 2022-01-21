@@ -4,6 +4,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import { BsWallet2 } from "react-icons/bs";
 //import logo from "../../images/logo.png";
 import { WalletReputationsContext } from "../context/WalletReputationsContext";
+import { shortenAddress } from "../utils/shortenAddress";
 
 const NavbarItem = ({ title, classProps }) => {
   return <li className={`mx-4 cursor-pointer ${classProps}`}>{title}</li>;
@@ -11,7 +12,7 @@ const NavbarItem = ({ title, classProps }) => {
 
 const Navbar = () => {
   const [toggleMenu, setToggleMenu] = React.useState(false);
-  const { currentAccount, connectWallet } = useContext(
+  const { currentAccount, currentChainName, connectWallet } = useContext(
     WalletReputationsContext
   );
   return (
@@ -32,15 +33,31 @@ const Navbar = () => {
         ))}
       </ul>
 
-      {!currentAccount && (
-        <button
-          type="button"
-          onClick={connectWallet}
-          className="text-white bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]"
-        >
-          <p className="text-white text-base font-semibold">Connect Wallet</p>
-        </button>
-      )}
+      <div className="md:flex hidden">
+        {!currentAccount && (
+          <button
+            type="button"
+            onClick={connectWallet}
+            className="text-white bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]"
+          >
+            <p className="text-white text-base font-semibold">Connect Wallet</p>
+          </button>
+        )}
+        {currentAccount && (
+          <button
+            type="button"
+            onClick={connectWallet}
+            className="text-white bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]"
+          >
+            <p className="text-white text-base font-semibold">
+              {shortenAddress(currentAccount)}
+            </p>
+            <p className="text-white text-base font-thin text-xs">
+              ({currentChainName})
+            </p>
+          </button>
+        )}
+      </div>
       <div className="flex relative">
         {!toggleMenu && (
           <HiMenuAlt4
