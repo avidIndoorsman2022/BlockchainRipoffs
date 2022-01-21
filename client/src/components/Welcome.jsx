@@ -4,7 +4,7 @@ import { SiEthereum } from "react-icons/si";
 import { BsInfoCircle } from "react-icons/bs";
 import { Loader } from ".";
 import { WalletReputationsContext } from "../context/WalletReputationsContext";
-//import { shortenAddress } from "../utils/shortenAddress";
+import { ReportResults } from ".";
 
 const companyCommonStyles =
   "min-h-[70px] sm:px-0 px-2 sm:min-w-[120px] flex justify-center items-center border-[0.5px] border-gray-400 text-sm font-light text-white";
@@ -21,9 +21,25 @@ const Input = ({ placeholder, name, type, value, handleChange }) => (
 );
 
 const Welcome = () => {
-  //const { connectWallet } = useContext(WalletReputationsContext);
+  const [showResults, setShowResults] = React.useState(false);
+  const {
+    getReputationReportsForAddress,
+    formData,
+    isLoading,
+    specificAddressReputationReports,
+    handleChange,
+  } = useContext(WalletReputationsContext);
 
-  const handleSubmit = () => {};
+  const handleSubmit = (e) => {
+    const { addressToLookFor } = formData;
+
+    e.preventDefault();
+
+    if (!addressToLookFor) return;
+
+    getReputationReportsForAddress();
+    setShowResults(true);
+  };
 
   return (
     <div className="flex w-full justify-center items-center">
@@ -39,14 +55,28 @@ const Welcome = () => {
           </p>
         </div>
         <form className="p-5 mt-5 w-full flex flex-col justify-start items-center blue-glassmorphism">
-          <Input placeholder="Address" name="addressTo" type="text" />
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="text-white bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]"
-          >
-            Check Address
-          </button>
+          <Input
+            placeholder="Address (or type in 0 to see a sample report)"
+            name="addressToLookFor"
+            type="text"
+            handleChange={handleChange}
+          />
+          {isLoading ? (
+            <Loader />
+          ) : (
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="text-white bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]"
+            >
+              Check Address
+            </button>
+          )}
+          {showResults ? (
+            <ReportResults
+              reputationResults={specificAddressReputationReports}
+            />
+          ) : null}
         </form>
       </div>
     </div>

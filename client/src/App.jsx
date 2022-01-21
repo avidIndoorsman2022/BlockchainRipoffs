@@ -2,6 +2,7 @@ import {
   Footer,
   Loader,
   Navbar,
+  ReportResults,
   Services,
   Transactions,
   Welcome,
