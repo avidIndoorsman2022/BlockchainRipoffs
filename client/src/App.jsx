@@ -3,7 +3,7 @@ import {
   Loader,
   Navbar,
   ReportResults,
-  Services,
+  EnterReport,
   Transactions,
   Welcome,
 } from "./components";
@@ -14,10 +14,10 @@ const App = () => {
       <div className="gradient-bg-welcome">
         <Navbar />
         <Welcome />
+        <EnterReport />
+        <Transactions />
+        <Footer />
       </div>
-      <Services />
-      <Transactions />
-      <Footer />
     </div>
   );
 };
