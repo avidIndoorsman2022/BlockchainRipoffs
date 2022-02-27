@@ -11,8 +11,8 @@ contract WalletReputations {
         address sender;  
         address receiver;      
         uint256 timestamp;   // when the fraud/scam took place
-        uint amount;         // units are denoted in 'blockchain' (below)
-        uint whoFiled;       // 0=sender, 1=receiver
+        uint256 amount;      // units are denoted in 'blockchain' (below)
+        bool fromFiled;      // true if From(sender) address filed this report
         bool disputed;       // true if opposing party has lodged a dispute
         string txnId;        // transaction Id of reputation
         string usersMessages; // text of messages left by originator and disputer, if any
@@ -21,7 +21,9 @@ contract WalletReputations {
 
     ReputationReportStruct[] public reputationReports;
 
-    event NewReputationReport(address sender, address receiver, uint256 timestamp, uint amount, uint whoFiled, bool disputed, string txnId, string messages, string tokenName);
+    event NewReputationReport(address sender, address receiver, 
+                uint256 timestamp, uint256 amount, bool fromFiled, 
+                bool disputed, string txnId, string messages, string tokenName);
     
     //
     // This mapping is for quickly updating an existing
@@ -44,8 +46,8 @@ contract WalletReputations {
     function createReputationReport(address _sender, 
                                     address _receiver, 
                                     uint256 _timestamp,
-                                    uint _amount,        
-                                    uint _whoFiled,
+                                    uint256 _amount,        
+                                    bool _fromFiled,
                                     bool _disputed,
                                     string memory _txnId,
                                     string memory _usersMessages,
@@ -62,14 +64,14 @@ contract WalletReputations {
                                               _receiver, 
                                               _timestamp,
                                               _amount, 
-                                              _whoFiled,
+                                              _fromFiled,
                                               _disputed,
                                               _txnId,
                                               _usersMessages, 
                                               _tokenName));
         reputationReportCount += 1;
         transactionIdToIndex[_txnId] = reputationReportCount;
-        emit NewReputationReport(_sender, _receiver, _timestamp, _amount, _whoFiled, _disputed, _txnId, _usersMessages, _tokenName);
+        emit NewReputationReport(_sender, _receiver, _timestamp, _amount, _fromFiled, _disputed, _txnId, _usersMessages, _tokenName);
     }
 
     function getAllReputationReports() public view returns (ReputationReportStruct[] memory) {

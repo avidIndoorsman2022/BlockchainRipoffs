@@ -57,6 +57,13 @@ const getChainName = (chainId) => {
 
 export const WalletReputationsProvider = ({ children }) => {
   const [formData, setformData] = useState({ addressToLookFor: "" });
+  const [enterFormData, setEnterFormData] = useState({
+    addressTo: "",
+    addressFrom: "",
+    amount: 0,
+    txnId: "",
+    userMessages: "",
+  });
   const [currentAccount, setCurrentAccount] = useState("");
   const [currentChainName, setCurrentChainName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -71,11 +78,48 @@ export const WalletReputationsProvider = ({ children }) => {
     setformData((prevState) => ({ ...prevState, [name]: e.target.value }));
   };
 
+  const handleEnterReportChange = (e, name) => {
+    setEnterFormData((prevState) => ({ ...prevState, [name]: e.target.value }));
+  };
+
+  const createOneReputationReport = async () => {
+    try {
+      const {
+        addressTo,
+        addressFrom,
+        timestamp,
+        amount,
+        whoFiled,
+        disputed,
+        txnId,
+        userMessages,
+        tokenName,
+      } = enterFormData;
+      setIsLoading(true);
+      const walletReputationsContract = createEthereumContract();
+      await walletReputationsContract.createReputationReport(
+        addressTo,
+        addressFrom,
+        timestamp,
+        BigInt(amount),
+        whoFiled,
+        disputed,
+        txnId,
+        userMessages,
+        tokenName
+      );
+    } catch (error) {
+      console.log(error);
+      throw new Error("createOneReputationReport: No ethereum object");
+    }
+  };
+
   const getReputationReportsForAddress = async () => {
     try {
       const { addressToLookFor } = formData;
       setIsLoading(true);
-      await getAllReputationReports();
+      const walletReputationsContract = createEthereumContract();
+      await walletReputationsContract.getAllReputationReports();
       console.log(
         "getReputationReportsForAddress: Number of ReputationReports: " +
           reputationReports.length
@@ -248,12 +292,15 @@ export const WalletReputationsProvider = ({ children }) => {
         connectWallet,
         getAllReputationReports,
         getReputationReportsForAddress,
+        createOneReputationReport,
         formData,
+        enterFormData,
         isLoading,
         reputationReports,
         reputationReportsCount,
         specificAddressReputationReports,
         handleChange,
+        handleEnterReportChange,
       }}
     >
       {children}
